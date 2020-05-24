@@ -649,11 +649,11 @@ plt.show()
     
 
 
-![svg](output_36_1.svg)
+![svg](plots/output_36_1.svg)
 
 
 
-![svg](output_36_2.svg)
+![svg](plots/output_36_2.svg)
 
 
 
