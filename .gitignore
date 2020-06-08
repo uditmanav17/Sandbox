@@ -1,4 +1,5 @@
 .vscode
 .exercism
 .pytest_cache
+.ipynb_checkpoints
 __pycache__
