@@ -1,0 +1,5 @@
+Jan 31 00:09:39 ubuntu.local ticky: INFO Created ticket [#4217] (mdouglas)
+Jan 31 00:16:25 ubuntu.local ticky: INFO Closed ticket [#1754] (noel)
+Jan 31 00:21:30 ubuntu.local ticky: ERROR The ticket was modified while updating (breee)
+Jan 31 00:44:34 ubuntu.local ticky: ERROR Permission denied while closing ticket (ac)
+Jan 31 01:00:50 ubuntu.local ticky: INFO Commented on ticket [#4709] (blossom)
