@@ -2,14 +2,16 @@
 
 This repository contain:-
 
-* [BERT Label Propagation](https://colab.research.google.com/github/uditmanav17/Sandbox/blob/master/BERT%20labelPropagation/BERT%2C%20label_propagation.ipynb) - Experimenting with BERT Embeddings and label propagation
-
 * Exercism python - Exercism exercises for python track
 
 * [File Handling](https://colab.research.google.com/github/uditmanav17/Sandbox/blob/master/File%20Handling/File%20Handling.ipynb) - Basic file handling operations
 
 * micro projects - beginner friendly python projects
 	* [HyperSkill](https://github.com/uditmanav17/Sandbox/tree/master/micro%20projects/Hyperskill)
+
+* NLP Stuffs
+	* [Label Propagation](https://colab.research.google.com/github/uditmanav17/Sandbox/blob/master/NLP/BERT%20labelPropagation/BERT-label_propagation.ipynb) using BERT and Clustering
+	* Introduction to [Text Classification](https://colab.research.google.com/drive/1CuPHT12UQy95RIdjeEsyAu_OfoCaeCpG#scrollTo=x6imLTTqphyC)
 
 * [Pathlib](https://colab.research.google.com/github/uditmanav17/Sandbox/blob/master/Pathlib/Pathlib.ipynb) - Working with Pathlib library
 
