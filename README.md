@@ -4,7 +4,11 @@ This repository contain:-
 
 * Exercism python - Exercism exercises for python track
 
+* [Fuzzy String Matching](https://colab.research.google.com/github/uditmanav17/Sandbox/blob/master/Fuzzy%20String%20Match/fuzzyStringMatching.ipynb)
+
 * [File Handling](https://colab.research.google.com/github/uditmanav17/Sandbox/blob/master/File%20Handling/File%20Handling.ipynb) - Basic file handling operations
+
+* ML Flow Basics
 
 * micro projects - beginner friendly python projects
 	* [HyperSkill](https://github.com/uditmanav17/Sandbox/tree/master/micro%20projects/Hyperskill)

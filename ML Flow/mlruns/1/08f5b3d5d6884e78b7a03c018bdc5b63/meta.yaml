@@ -1,0 +1,15 @@
+artifact_uri: mlruns/1/08f5b3d5d6884e78b7a03c018bdc5b63/artifacts
+end_time: 1599999221027
+entry_point_name: ''
+experiment_id: '1'
+lifecycle_stage: active
+name: ''
+run_id: 08f5b3d5d6884e78b7a03c018bdc5b63
+run_uuid: 08f5b3d5d6884e78b7a03c018bdc5b63
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1599999211328
+status: 3
+tags: []
+user_id: uditm
