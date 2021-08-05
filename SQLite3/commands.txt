@@ -1,0 +1,36 @@
+SQLite Browsing Tools
+- DB Browser
+- SQLite
+
+Install SQLite3
+
+Starting SQLite3 CLI
+> sqlite3
+
+Help
+> .help
+
+Exit
+> .quit
+
+Open db file with sqlite3 CLI
+> sqlite3 <db filename>
+
+List tables
+> .tables
+
+Show structure of table
+> .schema <table_name>
+
+Save query result to a text file
+> .output <filename>
+> SELECT * FROM table_name limit 10;
+
+Dump complete database into .sql file
+> .dump
+
+Dump table into .sql file
+> .dump <table_name>
+
+
+
