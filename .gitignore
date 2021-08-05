@@ -3,3 +3,8 @@
 .pytest_cache
 .ipynb_checkpoints
 __pycache__
+*.db
+
+/Code with Mosh/text*.txt
+*.zip
+*.sqbpro
