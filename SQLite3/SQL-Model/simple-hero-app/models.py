@@ -9,8 +9,19 @@ connect_args = {"check_same_thread": False}
 ENGINE = create_engine(SQLITE_URL, echo=True, connect_args=connect_args)
 
 
-class Hero(SQLModel, table=True):
-    id: Optional[int] = Field(default=None, primary_key=True)
+class HeroBase(SQLModel):
     name: str
     secret_name: str
     age: Optional[int] = None
+
+
+class Hero(HeroBase, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+
+
+class HeroCreate(HeroBase):
+    pass
+
+
+class HeroRead(HeroBase):
+    id: int

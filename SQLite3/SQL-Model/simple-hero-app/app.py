@@ -1,9 +1,13 @@
 # https://sqlmodel.tiangolo.com/tutorial/fastapi/simple-hero-api/
+# https://sqlmodel.tiangolo.com/tutorial/fastapi/response-model/
+# https://sqlmodel.tiangolo.com/tutorial/fastapi/multiple-models/ -> models.py
+
+from typing import List
 
 import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
-from models import ENGINE, Hero
+from models import ENGINE, Hero, HeroCreate, HeroRead
 from sqlmodel import Session, SQLModel, select
 
 
@@ -24,16 +28,22 @@ def docs_redirect():
     return RedirectResponse("/docs")
 
 
-@app.post("/heroes/")
-def create_hero(hero: Hero):
+@app.post(
+    "/heroes/",
+    response_model=HeroRead,
+    # response_model_exclude_unset=True,
+    # response_model_exclude={"secret_name"},
+)
+def create_hero(hero: HeroCreate):
     with Session(ENGINE) as session:
-        session.add(hero)
+        db_hero = Hero.from_orm(hero)
+        session.add(db_hero)
         session.commit()
-        session.refresh(hero)
-        return hero
+        session.refresh(db_hero)
+        return db_hero
 
 
-@app.get("/heroes/")
+@app.get("/heroes/", response_model=List[HeroRead])
 def read_heroes():
     with Session(ENGINE) as session:
         heroes = session.exec(select(Hero)).all()
