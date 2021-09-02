@@ -2,11 +2,9 @@
 
 This repository contain:-
 
-* [dataclasses](https://githubtocolab.com/uditmanav17/Sandbox/blob/master/dataclasses/dataclasses.ipynb) - Introduction 
+* [dataclasses](https://githubtocolab.com/uditmanav17/Sandbox/blob/master/dataclasses/dataclasses.ipynb) - Introduction
 
 * Data validation using [pydantic](https://githubtocolab.com/uditmanav17/Sandbox/blob/master/dataclasses/pydantic-dataclasses.ipynb) dataclasses and BaseModel
-
-* Exercism python - Exercism exercises for python track
 
 * [File Handling](https://colab.research.google.com/github/uditmanav17/Sandbox/blob/master/File%20Handling/File%20Handling.ipynb) - Basic file handling operations
 
@@ -31,12 +29,3 @@ This repository contain:-
 * [pyc_test](http://colab.research.google.com/github/uditmanav17/Sandbox/blob/master/pyc_test/base.ipynb) - Recovering source code from .pyc file
 
 * [Sklearn pipline](https://colab.research.google.com/github/uditmanav17/Sandbox/blob/master/Sklearn%20pipeline/sklearn%20pipeline.ipynb) - Working example of sklearn pipline
-	
-
-
-
-
-
-
-
-
