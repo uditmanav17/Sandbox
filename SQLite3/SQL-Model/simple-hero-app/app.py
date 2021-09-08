@@ -8,9 +8,11 @@
 # https://sqlmodel.tiangolo.com/tutorial/fastapi/teams/ -> models.py
 # https://sqlmodel.tiangolo.com/tutorial/fastapi/relationships/ -> models.py
 # fastapi customization -> https://fastapi.tiangolo.com/tutorial/metadata/
+# fastapi customization -> https://fastapi.tiangolo.com/tutorial/path-operation-configuration/
 from typing import List
 
 import uvicorn
+from fastapi import Depends, FastAPI, HTTPException, Query, status
 from fastapi.responses import JSONResponse
 from models import (
     ENGINE,
@@ -27,8 +29,6 @@ from models import (
 )
 from sqlmodel import Session, SQLModel, select
 from starlette.responses import HTMLResponse
-
-from fastapi import Depends, FastAPI, HTTPException, Query, status
 
 
 def create_db_and_tables():
@@ -99,8 +99,7 @@ def get_session():
 
 @app.get("/", include_in_schema=False)
 def index():
-    return HTMLResponse(
-        """
+    content = """
 <html>
 <body>
 <title> Heroes App </title>
@@ -109,20 +108,10 @@ def index():
     <li><a href='/documentation'> Try API </a></li>
     <li><a href='/redoc'> Documentation </a></li>
 </ul>
-
 </body>
 </html>
     """
-    )
-
-
-# @app.get("/", include_in_schema=False)
-# def docs_redirect():
-#     return RedirectResponse("/documentation")
-
-# @app.get("/", include_in_schema=False)
-# def redoc_redirect():
-#     return RedirectResponse("/redoc")
+    return HTMLResponse(content=content)
 
 
 @app.post(
