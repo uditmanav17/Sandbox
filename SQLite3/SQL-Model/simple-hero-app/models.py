@@ -74,3 +74,24 @@ class HeroReadWithTeam(HeroRead):
 
 class TeamReadWithHeroes(TeamRead):
     heroes: List[HeroRead] = []
+
+
+# models used for authorization
+class Token(SQLModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(SQLModel):
+    username: Optional[str] = None
+
+
+class User(SQLModel):
+    username: str
+    email: Optional[str] = None
+    full_name: Optional[str] = None
+    disabled: Optional[bool] = None
+
+
+class UserInDB(User):
+    hashed_password: str

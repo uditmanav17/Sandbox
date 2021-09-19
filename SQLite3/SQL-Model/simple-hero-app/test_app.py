@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 from models import Hero
 from sqlmodel import Session, SQLModel, create_engine
 from sqlmodel.pool import StaticPool
+from starlette import responses
 
 
 @pytest.fixture(name="session")
@@ -41,27 +42,62 @@ def client_fixture(session: Session):
     app.dependency_overrides.clear()
 
 
-def test_create_hero(client: TestClient):
+@pytest.fixture(name="get_token")
+def get_token(client: TestClient):
+    response = client.post(
+        "/token",
+        data={"username": "abc", "password": "abc@123"},
+        headers={
+            "content-type": "application/x-www-form-urlencoded",
+        },
+    )
+    response_data = response.json()
+    return response_data["access_token"]
+
+
+def test_login(client: TestClient):
+    response = client.post(
+        "/token",
+        data={"username": "abc", "password": "abc@123"},
+        headers={
+            "content-type": "application/x-www-form-urlencoded",
+        },
+    )
+    response_data = response.json()
+    print(response_data)
+    assert response.status_code == 200
+    assert "access_token" in response_data
+    assert response_data["token_type"] == "bearer"
+
+
+def test_create_hero(client: TestClient, get_token: str):
     # use this client to talk to the API and send a POST HTTP operation, creating a new hero.
     response = client.post(
-        "/heroes/", json={"name": "Deadpond", "secret_name": "Dive Wilson"}
+        "/heroes/",
+        json={"name": "Deadpond", "secret_name": "Dive Wilson"},
+        headers={"Authorization": f"Bearer {get_token}"},
     )
     data = response.json()
-
-    assert response.status_code == 200
+    print(data)
+    # hero created response - 201
+    assert response.status_code == 201
     assert data["name"] == "Deadpond"
     assert data["secret_name"] == "Dive Wilson"
     assert data["age"] is None
     assert data["id"] is not None
 
 
-def test_create_hero_incomplete(client: TestClient):
+def test_create_hero_incomplete(client: TestClient, get_token: str):
     # No secret_name
-    response = client.post("/heroes/", json={"name": "Deadpond"})
+    response = client.post(
+        "/heroes/",
+        json={"name": "Deadpond"},
+        headers={"Authorization": f"Bearer {get_token}"},
+    )
     assert response.status_code == 422
 
 
-def test_create_hero_invalid(client: TestClient):
+def test_create_hero_invalid(client: TestClient, get_token: str):
     # secret_name has an invalid type
     response = client.post(
         "/heroes/",
@@ -69,6 +105,7 @@ def test_create_hero_invalid(client: TestClient):
             "name": "Deadpond",
             "secret_name": {"message": "Do you wanna know my secret identity?"},
         },
+        headers={"Authorization": f"Bearer {get_token}"},
     )
     assert response.status_code == 422
 
@@ -111,12 +148,16 @@ def test_read_hero(session: Session, client: TestClient):
     assert data["id"] == hero_1.id
 
 
-def test_update_hero(session: Session, client: TestClient):
+def test_update_hero(session: Session, client: TestClient, get_token: str):
     hero_1 = Hero(name="Deadpond", secret_name="Dive Wilson")
     session.add(hero_1)
     session.commit()
 
-    response = client.patch(f"/heroes/{hero_1.id}", json={"name": "Deadpuddle"})
+    response = client.patch(
+        f"/heroes/{hero_1.id}",
+        json={"name": "Deadpuddle"},
+        headers={"Authorization": f"Bearer {get_token}"},
+    )
     data = response.json()
 
     assert response.status_code == 200
@@ -126,15 +167,16 @@ def test_update_hero(session: Session, client: TestClient):
     assert data["id"] == hero_1.id
 
 
-def test_delete_hero(session: Session, client: TestClient):
+def test_delete_hero(session: Session, client: TestClient, get_token: str):
     hero_1 = Hero(name="Deadpond", secret_name="Dive Wilson")
     session.add(hero_1)
     session.commit()
 
-    response = client.delete(f"/heroes/{hero_1.id}")
-
+    response = client.delete(
+        f"/heroes/{hero_1.id}",
+        headers={"Authorization": f"Bearer {get_token}"},
+    )
     hero_in_db = session.get(Hero, hero_1.id)
 
     assert response.status_code == 200
-
     assert hero_in_db is None

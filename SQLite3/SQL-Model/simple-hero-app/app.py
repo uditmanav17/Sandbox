@@ -9,11 +9,13 @@
 # https://sqlmodel.tiangolo.com/tutorial/fastapi/relationships/ -> models.py
 # fastapi customization -> https://fastapi.tiangolo.com/tutorial/metadata/
 # fastapi customization -> https://fastapi.tiangolo.com/tutorial/path-operation-configuration/
+# fastapi Auth -> https://fastapi.tiangolo.com/tutorial/security/oauth2-jwt/
 from typing import List
 
 import uvicorn
 from fastapi import Depends, FastAPI, HTTPException, Query, status
 from fastapi.responses import JSONResponse
+from hero_auth import auth_router, get_current_active_user
 from models import (
     ENGINE,
     Hero,
@@ -26,6 +28,7 @@ from models import (
     TeamRead,
     TeamReadWithHeroes,
     TeamUpdate,
+    User,
 )
 from sqlmodel import Session, SQLModel, select
 from starlette.responses import HTMLResponse
@@ -35,20 +38,58 @@ def create_db_and_tables():
     SQLModel.metadata.create_all(ENGINE)
 
 
+def create_teams_and_heroes():
+    with Session(ENGINE) as session:
+        # creating teams
+        team_preventers = Team(name="Preventers", headquarters="Sharp Tower")
+        team_z_force = Team(name="Z-Force", headquarters="Sister Margaret’s Bar")
+        session.add(team_preventers)
+        session.add(team_z_force)
+        session.commit()
+
+        # creating heroes and assigning them to team
+        hero_deadpond = Hero(
+            name="Deadpond", secret_name="Dive Wilson", team_id=team_z_force.id
+        )
+        hero_rusty_man = Hero(
+            name="Rusty-Man",
+            secret_name="Tommy Sharp",
+            age=48,
+            team_id=team_preventers.id,
+        )
+        hero_spider_boy = Hero(name="Spider-Boy", secret_name="Pedro Parqueador")
+        session.add(hero_deadpond)
+        session.add(hero_rusty_man)
+        session.add(hero_spider_boy)
+        session.commit()
+
+
+def add_dummy_data():
+    with Session(ENGINE) as session:
+        # check if heroes/teams are present in DB
+        heroes_count = len(session.exec(select(Hero.id)).all())
+        teams_count = len(session.exec(select(Team.id)).all())
+
+    print(heroes_count, teams_count)
+    if heroes_count == 0 and teams_count == 0:
+        create_teams_and_heroes()
+
+
 description = """
 Heroes and Teams API helps you do awesome stuff. 🚀
 
 ## Heroes
-
 You can **create, read and update heroes**.
 
 ## Teams
-
 You will be able to:
-
 * **Create teams** (_implemented_).
 * **Read teams** (_implemented_).
 * **Update teams** (_implemented_).
+
+## Authorization
+You can use any username and password combination for authorization. To check for disabled user use - username:"johndoe", password:"secret" combination.
+\nFor example: if username = abc, then password = abc@123.
 """
 
 # The order of each tag metadata dictionary also defines the order shown in the docs UI.
@@ -85,11 +126,13 @@ app = FastAPI(
     docs_url="/documentation",
     # redoc_url="/redoc",
 )
+app.include_router(auth_router)
 
 
 @app.on_event("startup")
 def on_startup():
     create_db_and_tables()
+    add_dummy_data()
 
 
 def get_session():
@@ -100,16 +143,16 @@ def get_session():
 @app.get("/", include_in_schema=False)
 def index():
     content = """
-<html>
-<body>
-<title> Heroes App </title>
-<h1>Heroes and Teams management</h1>
-<ul>
-    <li><a href='/documentation'> Try API </a></li>
-    <li><a href='/redoc'> Documentation </a></li>
-</ul>
-</body>
-</html>
+        <html>
+        <body>
+        <title> Heroes App </title>
+        <h1>Heroes and Teams management</h1>
+        <ul>
+            <li><a href='/documentation'> Try API </a></li>
+            <li><a href='/redoc'> Documentation </a></li>
+        </ul>
+        </body>
+        </html>
     """
     return HTMLResponse(content=content)
 
@@ -122,7 +165,12 @@ def index():
     # response_model_exclude_unset=True,
     # response_model_exclude={"secret_name"},
 )
-def create_hero(*, session: Session = Depends(get_session), hero: HeroCreate):
+def create_hero(
+    *,
+    session: Session = Depends(get_session),
+    hero: HeroCreate,
+    current_user: User = Depends(get_current_active_user),
+):
     # Here we are passing the parameter session that has a "default value" of Depends(get_session)
     # before the parameter hero, that doesn't have any default value.
     # Python would normally complain about that, but we can use the initial "parameter" *,
@@ -167,7 +215,11 @@ def read_hero(*, session: Session = Depends(get_session), hero_id: int):
 # We will use a PATCH HTTP operation. This is used to partially update data, which is what we are doing.
 @app.patch("/heroes/{hero_id}", response_model=HeroRead, tags=["heroes"])
 def update_hero(
-    *, session: Session = Depends(get_session), hero_id: int, hero: HeroUpdate
+    *,
+    session: Session = Depends(get_session),
+    hero_id: int,
+    hero: HeroUpdate,
+    current_user: User = Depends(get_current_active_user),
 ):
     db_hero = session.get(Hero, hero_id)
     if not db_hero:
@@ -192,7 +244,12 @@ def update_hero(
 
 
 @app.delete("/heroes/{hero_id}", tags=["heroes"], status_code=status.HTTP_200_OK)
-def delete_hero(*, session: Session = Depends(get_session), hero_id: int):
+def delete_hero(
+    *,
+    session: Session = Depends(get_session),
+    hero_id: int,
+    current_user: User = Depends(get_current_active_user),
+):
     hero = session.get(Hero, hero_id)
     if not hero:
         raise HTTPException(status_code=404, detail="Hero not found")
@@ -207,7 +264,12 @@ def delete_hero(*, session: Session = Depends(get_session), hero_id: int):
     tags=["teams"],
     status_code=status.HTTP_201_CREATED,
 )
-def create_team(*, session: Session = Depends(get_session), team: TeamCreate):
+def create_team(
+    *,
+    session: Session = Depends(get_session),
+    team: TeamCreate,
+    current_user: User = Depends(get_current_active_user),
+):
     db_team = Team.from_orm(team)
     session.add(db_team)
     session.commit()
@@ -252,6 +314,7 @@ def update_team(
     session: Session = Depends(get_session),
     team_id: int,
     team: TeamUpdate,
+    current_user: User = Depends(get_current_active_user),
 ):
     db_team = session.get(Team, team_id)
     if not db_team:
@@ -266,7 +329,12 @@ def update_team(
 
 
 @app.delete("/teams/{team_id}", tags=["teams"], status_code=status.HTTP_200_OK)
-def delete_team(*, session: Session = Depends(get_session), team_id: int):
+def delete_team(
+    *,
+    session: Session = Depends(get_session),
+    team_id: int,
+    current_user: User = Depends(get_current_active_user),
+):
     team = session.get(Team, team_id)
     if not team:
         raise HTTPException(status_code=404, detail="Team not found")
