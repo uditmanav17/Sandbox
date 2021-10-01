@@ -1,0 +1,16 @@
+sqlalchemy==1.4.23
+python-jose[cryptography]
+passlib[bcrypt]
+sqlmodel
+fastapi
+uvicorn
+python-multipart
+
+
+# dev
+# anyio
+# pytest
+# pytest-asyncio
+# pytest-tornasync
+# pytest-trio
+# pytest-twisted
