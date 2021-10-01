@@ -32,6 +32,7 @@ from models import (
 )
 from sqlmodel import Session, SQLModel, select
 from starlette.responses import HTMLResponse
+import os
 
 
 def create_db_and_tables():
@@ -102,10 +103,7 @@ tags_metadata = [
             "url": "https://en.wikipedia.org/wiki/Category:Marvel_Comics_superhero_teams",
         },
     },
-    {
-        "name": "heroes",
-        "description": "Operations with **heroes**.",
-    },
+    {"name": "heroes", "description": "Operations with **heroes**.",},
 ]
 app = FastAPI(
     title="Heroes App",
@@ -186,9 +184,7 @@ def create_hero(
 # By default, we will return the first results from the database, so offset will have a default value of 0.
 # And by default, we will return a maximum of 100 heroes, so limit will have a default value of 100.
 @app.get(
-    "/heroes/",
-    response_model=List[HeroRead],
-    tags=["heroes"],
+    "/heroes/", response_model=List[HeroRead], tags=["heroes"],
 )
 def read_heroes(
     *,
@@ -201,9 +197,7 @@ def read_heroes(
 
 
 @app.get(
-    "/heroes/{hero_id}",
-    response_model=HeroReadWithTeam,
-    tags=["heroes"],
+    "/heroes/{hero_id}", response_model=HeroReadWithTeam, tags=["heroes"],
 )
 def read_hero(*, session: Session = Depends(get_session), hero_id: int):
     hero = session.get(Hero, hero_id)
@@ -278,9 +272,7 @@ def create_team(
 
 
 @app.get(
-    "/teams/",
-    response_model=List[TeamRead],
-    tags=["teams"],
+    "/teams/", response_model=List[TeamRead], tags=["teams"],
 )
 def read_teams(
     *,
@@ -293,9 +285,7 @@ def read_teams(
 
 
 @app.get(
-    "/teams/{team_id}",
-    response_model=TeamReadWithHeroes,
-    tags=["teams"],
+    "/teams/{team_id}", response_model=TeamReadWithHeroes, tags=["teams"],
 )
 def read_team(*, team_id: int, session: Session = Depends(get_session)):
     team = session.get(Team, team_id)
@@ -305,9 +295,7 @@ def read_team(*, team_id: int, session: Session = Depends(get_session)):
 
 
 @app.patch(
-    "/teams/{team_id}",
-    response_model=TeamRead,
-    tags=["teams"],
+    "/teams/{team_id}", response_model=TeamRead, tags=["teams"],
 )
 def update_team(
     *,
@@ -346,4 +334,5 @@ def delete_team(
 if __name__ == "__main__":
     # to run from cli use - uvicorn app:app --reload
     # file_name:object
-    uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
+    port = os.environ.get("PORT", 8081)
+    uvicorn.run("app:app", host="0.0.0.0", port=port, reload=True)
