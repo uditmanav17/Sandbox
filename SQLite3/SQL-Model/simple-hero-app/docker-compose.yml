@@ -2,17 +2,23 @@ version: "3.9"
 
 services: 
 
-  fast_heroes:
+  fast_heroes: # APPLICATION_SERVICE_NAME
+    restart: unless-stopped
     depends_on:
       - postgres
-    container_name: hero_app
+    # container_name: hero_app # removed name for scaling purpose
     build: 
       context: ./hero-app/
       dockerfile: Dockerfile
+    networks:
+      - frontend
+      - backend
     ports:
-      - ${HOST_PORT}:${CONTAINER_PORT}
+      # removed mapping for scaling purpose, will be routed via nginx
+      # - ${HOST_PORT}:${APPLICATION_PORT}  
+      - ${APPLICATION_PORT}
     # environment:
-    #   - CONTAINER_PORT=${CONTAINER_PORT}
+    #   - APPLICATION_PORT=${APPLICATION_PORT}
     #   - POSTGRES_DB=${POSTGRES_DB}
     #   - POSTGRES_USER=${POSTGRES_USER}
     #   - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -20,20 +26,54 @@ services:
     #   - DB_SERVICE_PORT=${DB_SERVICE_PORT}
     env_file:
       - .env
+    volumes: # when can't connect to postgres db, then use sqlite
+      - type: volume
+        source: sqlite-vol
+        target: /app/sql-db
 
-  postgres: # this should be DB_SERVICE_NAME
+  postgres: # DB_SERVICE_NAME
     container_name: database
     image: postgres
     volumes: 
     - type: volume
       source: postgres-vol
       target: /var/lib/postgresql/data
+    networks:
+      - backend
     environment: 
       # by default these variables will be fetched from .env file
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 
+  # check ./nginx/nginx.conf for complete description
+  nginx:
+    image: nginx:1.21
+    volumes:
+      # template file for load balancing, using ENV
+      # - ./nginx/templates:/etc/nginx/templates # long format below
+      - type: bind
+        source: ./nginx/templates
+        target: /etc/nginx/templates
+      # static conf file for load balancing
+      # - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - fast_heroes
+    networks:
+      - frontend
+    environment:
+      - NGINX_PORT=${NGINX_PORT}
+      - APPLICATION_PORT=${APPLICATION_PORT}
+      - APPLICATION_SERVICE_NAME=${APPLICATION_SERVICE_NAME}
+      # refer - https://hub.docker.com/_/nginx
+      - NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx
+    ports:
+      - ${HOST_PORT}:${NGINX_PORT}
+
 volumes:
   postgres-vol: {}
-  
+  sqlite-vol: {}
+
+networks: 
+    frontend: {}
+    backend: {}

@@ -17,7 +17,6 @@ from fastapi import Depends, FastAPI, HTTPException, Query, status
 from fastapi.responses import JSONResponse
 from hero_auth import auth_router, get_current_active_user
 from models import (
-    ENGINE,
     Hero,
     HeroCreate,
     HeroRead,
@@ -30,13 +29,33 @@ from models import (
     TeamUpdate,
     User,
 )
-from sqlmodel import Session, SQLModel, select
+from sqlmodel import Session, SQLModel, select, create_engine
 from starlette.responses import HTMLResponse
 import os
+import socket
+from pathlib import Path
 
 
 def create_db_and_tables():
-    SQLModel.metadata.create_all(ENGINE)
+    try:
+        DB_SERVICE_PORT = os.environ.get("DB_SERVICE_PORT")
+        DB_SERVICE_NAME = os.environ.get("DB_SERVICE_NAME")
+        POSTGRES_DB = os.environ.get("POSTGRES_DB")
+        DB_USERNAME = os.environ.get("POSTGRES_USER")
+        DB_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
+        # DB_URI = "postgresql://udit:uditmanav@postgres:5432/ud_db"
+        DB_URI = f"postgresql://{DB_USERNAME}:{DB_PASSWORD}@{DB_SERVICE_NAME}:{DB_SERVICE_PORT}/{POSTGRES_DB}"
+        ENGINE = create_engine(DB_URI, echo=True)
+        SQLModel.metadata.create_all(ENGINE)
+    except:
+        print("CAN'T CONNECT TO POSTGRESQL\n\tFALLING BACK TO SQLITE")
+        SQLITE_FILE_NAME = Path("./sql-db/database.db")
+        SQLITE_FILE_NAME.parent.mkdir(parents=True, exist_ok=True)
+        SQLITE_DB_URI = f"sqlite:///{SQLITE_FILE_NAME}"
+        connect_args = {"check_same_thread": False}
+        ENGINE = create_engine(SQLITE_DB_URI, echo=True, connect_args=connect_args)
+        SQLModel.metadata.create_all(ENGINE)
+    return ENGINE
 
 
 def create_teams_and_heroes():
@@ -76,8 +95,9 @@ def add_dummy_data():
         create_teams_and_heroes()
 
 
-description = """
+description = f"""
 Heroes and Teams API helps you do awesome stuff. 🚀
+Served by Container with ID - **{socket.gethostname()}**
 
 ## Heroes
 You can **create, read and update heroes**.
@@ -129,7 +149,8 @@ app.include_router(auth_router)
 
 @app.on_event("startup")
 def on_startup():
-    create_db_and_tables()
+    global ENGINE
+    ENGINE = create_db_and_tables()
     add_dummy_data()
 
 
@@ -334,5 +355,5 @@ def delete_team(
 if __name__ == "__main__":
     # to run from cli use - uvicorn app:app --reload
     # file_name:object
-    port = os.environ.get("PORT", 8081)
+    port = os.environ.get("APPLICATION_PORT", 8081)
     uvicorn.run("app:app", host="0.0.0.0", port=port, reload=True)

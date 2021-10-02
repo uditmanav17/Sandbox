@@ -5,6 +5,7 @@ sqlmodel
 fastapi
 uvicorn
 python-multipart
+email-validator
 # for postgres
 psycopg2
 

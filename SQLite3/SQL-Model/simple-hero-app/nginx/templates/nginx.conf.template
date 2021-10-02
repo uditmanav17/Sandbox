@@ -1,0 +1,20 @@
+# https://pspdfkit.com/blog/2018/how-to-use-docker-compose-to-run-multiple-instances-of-a-service-in-development/
+# https://marcofranssen.nl/nginx-1-19-supports-environment-variables-and-templates-in-docker
+# https://hub.docker.com/_/nginx
+# https://www.youtube.com/watch?v=42Q65H8ch7U
+
+user  nginx;
+
+events {
+  worker_connections   1000;
+}
+
+
+http {
+  server {
+    listen  ${NGINX_PORT};
+    location / {
+      proxy_pass http://${APPLICATION_SERVICE_NAME}:${APPLICATION_PORT};
+    }
+  }
+}
