@@ -112,7 +112,7 @@ app = FastAPI(
     terms_of_service="http://example.com/terms/",
     contact={
         "name": "Udit Manav",
-        "url": "https://www.google.com/",
+        "url": "https://github.com/uditmanav17",
         "email": "abc@def.com",
     },
     license_info={

@@ -6,22 +6,34 @@ services:
     depends_on:
       - postgres
     container_name: hero_app
-    build: ./hero-app/
+    build: 
+      context: ./hero-app/
+      dockerfile: Dockerfile
     ports:
-      - 8080:8080
-    environment:
-      - PORT=8080
-      - POSTGRES_DB=ud_db
-      - POSTGRES_USER=udit
-      - POSTGRES_PASSWORD=uditmanav
-      - DB_SERVICE_NAME=postgres
-      - DB_SERVICE_PORT=5432
+      - ${HOST_PORT}:${CONTAINER_PORT}
+    # environment:
+    #   - CONTAINER_PORT=${CONTAINER_PORT}
+    #   - POSTGRES_DB=${POSTGRES_DB}
+    #   - POSTGRES_USER=${POSTGRES_USER}
+    #   - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    #   - DB_SERVICE_NAME=${DB_SERVICE_NAME}
+    #   - DB_SERVICE_PORT=${DB_SERVICE_PORT}
+    env_file:
+      - .env
 
-  postgres:
+  postgres: # this should be DB_SERVICE_NAME
     container_name: database
     image: postgres
+    volumes: 
+    - type: volume
+      source: postgres-vol
+      target: /var/lib/postgresql/data
     environment: 
-      - POSTGRES_DB=ud_db
-      - POSTGRES_USER=udit
-      - POSTGRES_PASSWORD=uditmanav
+      # by default these variables will be fetched from .env file
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 
+volumes:
+  postgres-vol: {}
+  

@@ -22,8 +22,8 @@ RUN apt-get update && apt-get install libpq-dev -y && \
 # include python in path at beginning
 ENV PATH=/app/local_env/bin:$PATH
 
-ENV PORT=8501
-EXPOSE ${PORT}
+ENV CONTAINER_PORT=8501
+EXPOSE ${CONTAINER_PORT}
 # CMD ["python", "-m" ,"uvicorn", "app:app", "--host=0.0.0.0", "--port=${PORT}"]
-CMD python -m uvicorn app:app --host=0.0.0.0 --port=${PORT}
+CMD python -m uvicorn app:app --host=0.0.0.0 --port=${CONTAINER_PORT}
 # CMD [ "python", "app.py"]
