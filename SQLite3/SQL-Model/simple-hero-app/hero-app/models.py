@@ -1,12 +1,21 @@
 from typing import List, Optional
 
 from sqlmodel import Field, Relationship, SQLModel, create_engine
+import os
 
-SQLITE_FILE_NAME = "database.db"
-SQLITE_URL = f"sqlite:///{SQLITE_FILE_NAME}"
+# SQLITE_FILE_NAME = "database.db"
+# DB_URI = f"sqlite:///{SQLITE_FILE_NAME}"
+# DB_URI = "postgresql://udit:uditmanav@postgres:5432/ud_db"
+DB_SERVICE_PORT = os.environ.get("DB_SERVICE_PORT")
+DB_SERVICE_NAME = os.environ.get("DB_SERVICE_NAME")
+POSTGRES_DB = os.environ.get("POSTGRES_DB")
+DB_USERNAME = os.environ.get("POSTGRES_USER")
+DB_PASSWORD = os.environ.get("POSTGRES_PASSWORD")
+DB_URI = f"postgresql://{DB_USERNAME}:{DB_PASSWORD}@{DB_SERVICE_NAME}:{DB_SERVICE_PORT}/{POSTGRES_DB}"
 
 connect_args = {"check_same_thread": False}
-ENGINE = create_engine(SQLITE_URL, echo=True, connect_args=connect_args)
+# ENGINE = create_engine(DB_URI, echo=True, connect_args=connect_args)
+ENGINE = create_engine(DB_URI, echo=True)
 
 
 class TeamBase(SQLModel):

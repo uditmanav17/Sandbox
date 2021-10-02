@@ -1,10 +1,27 @@
 version: "3.9"
 
 services: 
+
   fast_heroes:
+    depends_on:
+      - postgres
     container_name: hero_app
     build: ./hero-app/
     ports:
       - 8080:8080
     environment:
       - PORT=8080
+      - POSTGRES_DB=ud_db
+      - POSTGRES_USER=udit
+      - POSTGRES_PASSWORD=uditmanav
+      - DB_SERVICE_NAME=postgres
+      - DB_SERVICE_PORT=5432
+
+  postgres:
+    container_name: database
+    image: postgres
+    environment: 
+      - POSTGRES_DB=ud_db
+      - POSTGRES_USER=udit
+      - POSTGRES_PASSWORD=uditmanav
+

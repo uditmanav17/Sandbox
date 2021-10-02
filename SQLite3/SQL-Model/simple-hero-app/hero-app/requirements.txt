@@ -5,7 +5,8 @@ sqlmodel
 fastapi
 uvicorn
 python-multipart
-
+# for postgres
+psycopg2
 
 # dev
 # anyio
