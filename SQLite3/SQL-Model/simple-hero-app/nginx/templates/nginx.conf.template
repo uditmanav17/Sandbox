@@ -1,5 +1,6 @@
 # https://pspdfkit.com/blog/2018/how-to-use-docker-compose-to-run-multiple-instances-of-a-service-in-development/
 # https://marcofranssen.nl/nginx-1-19-supports-environment-variables-and-templates-in-docker
+# https://towardsdatascience.com/sample-load-balancing-solution-with-docker-and-nginx-cf1ffc60e644
 # https://hub.docker.com/_/nginx
 # https://www.youtube.com/watch?v=42Q65H8ch7U
 
