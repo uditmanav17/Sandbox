@@ -1,0 +1,6 @@
+# Development settings
+
+DOMAIN=example1.org
+ADMIN_EMAIL=admin1@${DOMAIN}
+ROOT_URL=${DOMAIN}/app1
+
