@@ -46,7 +46,6 @@ def create_user_by_name(user_name: str):
         "username": user_name,
         "full_name": user_name,
         "email": f"{user_name}@example.com",
-        # hashed_password corresponds to "secret"
         "hashed_password": get_password_hash(f"{user_name}@123"),
         "disabled": False,
     }

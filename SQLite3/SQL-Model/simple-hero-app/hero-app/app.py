@@ -14,7 +14,7 @@ from typing import List
 
 import uvicorn
 from fastapi import Depends, FastAPI, HTTPException, Query, status
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 from hero_auth import auth_router, get_current_active_user
 from models import (
     Hero,
@@ -30,7 +30,6 @@ from models import (
     User,
 )
 from sqlmodel import Session, SQLModel, select, create_engine
-from starlette.responses import HTMLResponse
 import os
 import socket
 from pathlib import Path
@@ -198,6 +197,8 @@ def create_hero(
     session.add(db_hero)
     session.commit()
     session.refresh(db_hero)
+    print(current_user)
+    print(f"Hero Created by user - {current_user.username}")
     return db_hero
 
 
