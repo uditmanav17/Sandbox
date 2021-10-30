@@ -1,0 +1,89 @@
+Create django project
+> django-admin startproject <project_name> .
+
+Start project
+> python manage.py runserver <port>
+
+Creating Apps
+> python manage.py startapp <app_name>
+
+Creating App Views
+functions that will be served as web page. Check movies > views.py
+
+Mapping Views to URL
+1. Create a new file urls.py in movies app and map path URL to view
+2. Go project's (not app's) urls.py and register app's URL file in project's url patterns
+3. Check - http://localhost:8000/movies/
+
+Creating models and making migrations
+1. In app's models.py create models that will be treated as database objects
+2. Register app's models to project settings INSTALLED_APPS
+3. Check how many migrations > python manage.py makemigrations
+4. To migrate all models to db > python manage.py migrate
+
+Making changes to models
+1. Add/delete new field to models class
+2. python manage.py makemigrations
+3. python manage.py migrate
+
+Check exact query that is being send to Database
+1. python manage.py sqlmigrate <app_name> <migration_number>
+2. python manage.py sqlmigrate movies 0001
+
+Creating admin user
+1. python manage.py createsuperuser
+2. enter credentials
+3. login from http://localhost:8000/admin/
+
+Adding custom models to admin console
+1. Go to admin.py in app
+2. Import models
+3. Register models to app
+
+Displaying custom fields in admin console
+1. Go to admin.py in app and create custom classes to display custom information
+
+Templating
+1. Create templates folder in app
+2. Create HTML templates in that folder, use Jinja wherever needed
+3. In views.py, render the template using render function
+
+Bootstraping
+1. Copy bootstrap template from https://getbootstrap.com/docs/5.0/getting-started/introduction/
+2. Create a base template in templates
+3. Extend this base.html to other html files
+
+Bootstrap Components
+
+
+Sharing templates across apps
+1. Create templates folder in project
+2. Create base.html in this folder
+3. Open settings.py and navigate to TEMPLATES
+4. Add this templates folder to TEMPLATES > DIRS
+
+URL Parameters
+1. Goto urls.py in app
+2. Create a new url pattern
+3. Create a view/template corresponding to that pattern
+
+Raising 404 Error
+1. get_object_or_404
+
+Referencing URLs
+1. Declare app_name in urls.py of app
+2. Reference that view using convention <app_name>:<view>
+
+Creating API
+1. Install django-tastypie
+2. Create new app api
+3. Register app in settings.py
+4. Create new model in api app
+5. Import model to project's urls.py
+6. Create models's object and include in URL patterns
+
+Adding Homepage
+1. Create views.py in project
+2. Create view
+3. Include view in urlpatterns
+4. Place render template in project's template
