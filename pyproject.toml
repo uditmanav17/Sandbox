@@ -14,7 +14,7 @@ exclude = '''
 
 [tool.isort]
 # https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html
-known_third_party = ["api", "app", "base", "django", "fastapi", "mlflow", "models", "movies", "numpy", "pandas", "player_classes", "pytest", "sklearn", "sqlmodel", "starlette", "tastypie", "uvicorn"]
+known_third_party = ["api", "app", "base", "django", "fastapi", "mlflow", "models", "movies", "numpy", "pandas", "phonebook", "player_classes", "pytest", "sklearn", "sqlmodel", "starlette", "tastypie", "uvicorn"]
 profile = "black"
 multi_line_output = 3
 include_trailing_comma = "True"
