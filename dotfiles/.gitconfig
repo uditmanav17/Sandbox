@@ -1,0 +1,105 @@
+[user]
+	name = Udit Manav
+	email = uditmanav17@gmail.com
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[diff]
+	tool = vscode
+[difftool "vscode"]
+	cmd = "code --wait --diff $LOCAL $REMOTE"
+[merge]
+	tool = vscode
+[mergetool "vscode"]
+	cmd = "code --wait $MERGED"
+[filter "updateSecretToken"]
+	smudge = sed \"s/{SECRET_TOKEN}/RANDOM-STRING-TO-TEST-FILTERS/\"
+	clean = sed \"s/RANDOM-STRING-TO-TEST-FILTERS/{SECRET_TOKEN}/\"
+[status]
+	submoduleSummary = true
+[diff "jupyternotebook"]
+	command = git-nbdiffdriver diff
+[merge "jupyternotebook"]
+	driver = git-nbmergedriver merge %O %A %B %L %P
+	name = jupyter notebook merge driver
+[difftool "nbdime"]
+	cmd = git-nbdifftool diff \"$LOCAL\" \"$REMOTE\" \"$BASE\"
+[difftool]
+	prompt = false
+
+[mergetool "nbdime"]
+	cmd = git-nbmergetool merge \"$BASE\" \"$LOCAL\" \"$REMOTE\" \"$MERGED\"
+[mergetool]
+	prompt = false
+
+
+[color "status"]
+	added = green bold
+	changed = red bold strike
+	untracked = cyan
+	branch = yellow black bold ul
+
+[color "branch"]
+	current = yellow reverse
+	local = yellow
+	remote = green
+
+[color "diff"]
+	meta = yellow bold
+	frag = magenta bold # line info
+	old = red # deletions
+	new = green # additions
+
+[core]
+	longpaths = true
+	# Use custom `.gitignore` and `.gitattributes`.
+	excludesfile = ~/.gitignore
+	attributesfile = ~/.gitattributes
+
+[alias]
+	# View abbreviated SHA, description, and history graph of the latest 20 commits.
+	l = log --pretty=oneline -n 20 --graph --abbrev-commit
+
+	# View the current working tree status using the short format.
+	s = status -s
+
+	# Commit all changes.
+	ca = !git add -A && git commit -av
+
+	# Switch to a branch, creating it if necessary.
+	go = "!f() { git checkout -b \"$1\" 2> /dev/null || git checkout \"$1\"; }; f"
+
+	# List aliases.
+	aliases = config --get-regexp alias
+
+	# Find branches containing commit
+	fb = "!f() { git branch -a --contains $1; }; f"
+
+	# Find commits by source code
+	fc = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short -S$1; }; f"
+
+	# Find commits by commit message
+	fm = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short --grep=$1; }; f"
+
+	# Remove branches that have already been merged with main.
+	# a.k.a. ‘delete merged’
+	dm = "!git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
+
+	# List contributors with number of commits.
+	contributors = shortlog --summary --numbered
+
+	# Show the user email for the current repository.
+	whoami = config user.email
+
+[apply]
+	# Detect whitespace errors when applying a patch.
+	whitespace = fix
+
+[help]
+	# Automatically correct and execute mistyped commands.
+	autocorrect = 1
+
+[init]
+	defaultBranch = main

@@ -8,6 +8,8 @@ __pycache__
 /Code with Mosh/text*.txt
 *.zip
 *.sqbpro
+**/*[-_]old*
+
 
 
 # Byte-compiled / optimized / DLL files
