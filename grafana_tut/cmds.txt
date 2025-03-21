@@ -1,0 +1,8 @@
+
+- grafana docker
+docker run -d -p 3000:3000 --name=grafana grafana/grafana-oss
+
+- prometheus docker
+docker run --name prometheus -d -p 127.0.0.1:9090:9090 prom/prometheus
+
+
