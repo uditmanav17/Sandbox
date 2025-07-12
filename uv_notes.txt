@@ -1,0 +1,20 @@
+https://docs.astral.sh/uv/guides/
+
+- create env
+uv venv --python 3.10
+
+- activate env
+source .venv/bin/activate
+
+- initialize project
+uv init
+
+- pip install like command for pkg
+uv add pandas
+
+- pip install like command for pkg
+uv add --dev pandas
+
+- pip install like command from requirements.txt
+uv pip sync requirements.txt
+uv pip install -r requirements.txt
