@@ -4,7 +4,6 @@ This application was developed to get a better understanding of [FastApi](https:
 
 -----
 
-<details>
 <summary><strong>Salient Features</strong></summary>
 <br>
 
@@ -14,11 +13,9 @@ This application was developed to get a better understanding of [FastApi](https:
 - **Postgres** service as backend database (compose mode)
 - **Nginx** service as load balancer (compose mode) when scaling
 
-</details>
 
 -----
 
-<details>
 <summary><strong>Setting up</strong></summary>
 <br>
 
@@ -32,11 +29,9 @@ Running test cases
 
 **IMPORTANT** - Before proceeding to next section, rename `sample.env` to `.env`
 
-</details>
 
 ------
 
-<details>
 <summary><strong>Starting application</strong></summary>
 <br>
 
@@ -65,6 +60,5 @@ This application can be executed in 2 modes, both of which requires Docker insta
 	- Bring down stack 
 	- In compose mode, you have `postgres` as a dedicated DB. If you want to browse data you'd need to attach shell to `postgres` service
 
-</details>
 
 ------
