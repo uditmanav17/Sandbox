@@ -5,17 +5,45 @@ services:
     container_name: kafka
     ports:
       - "9092:9092"
+    volumes:
+      - ./kafka_data:/var/lib/kafka/data
     environment:
+      # Enable KRaft mode (no Zookeeper required)
       KAFKA_KRAFT_MODE: "true"
+
+      # Roles this node plays: 'broker' (handles data) and 'controller' (manages cluster metadata)
       KAFKA_PROCESS_ROLES: broker,controller
+
+      # Unique integer ID for this node in the cluster
       KAFKA_NODE_ID: 1
+
+      # Voters for the controller quorum (NodeID@host:port). Required for KRaft.
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+
+      # Interfaces the broker listens on. 0.0.0.0 means "all interfaces"
       KAFKA_LISTENERS: EXTERNAL://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+
+      # Maps listener names to security protocols (PLAINTEXT, SSL, SASL_SSL, etc.)
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+
+      # Name of the listener used for communication between brokers
       KAFKA_INTER_BROKER_LISTENER_NAME: EXTERNAL
+
+      # Name of the listener used by the controller
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+
+      # The hostname/port clients (like your python script) should use to connect.
+      # Must be reachable from OUTSIDE Docker (hence localhost)
       KAFKA_ADVERTISED_LISTENERS: EXTERNAL://localhost:9092
+
+      # How long to keep data logs before deletion (168 hours = 7 days)
       KAFKA_LOG_RETENTION_HOURS: 168
+
+      # Replication factor for the internal __consumer_offsets topic. Must be 1 for single-node.
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+      # Configures the default number of partitions for auto-created topics
+      KAFKA_NUM_PARTITIONS: 3
+
+      # A unique UUID for the cluster (required for KRaft formatting)
       CLUSTER_ID: "d33bd245-a018-40a3-91b1-b82cf89d9e1c"
-      # KAFKA_NUM_PARTITIONS: 3
