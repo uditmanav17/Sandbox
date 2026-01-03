@@ -10,21 +10,35 @@ fake = Faker()
 
 
 def generate_order():
-    """ Generates a random order dictionary containing mock transaction data. """
+    """Generates a random order dictionary containing mock transaction data."""
     order = {
         "order_id": fake.random_int(min=1000, max=9999),
         "customer_id": fake.random_int(min=1, max=10),
-        "total_price": round(fake.pyfloat(min_value=20.0, max_value=1000.0, right_digits=2), 2),
+        "total_price": round(
+            fake.pyfloat(min_value=20.0, max_value=1000.0, right_digits=2), 2
+        ),
         "customer_country": fake.country(),
         "merchant_country": fake.country(),
         "order_date": datetime.now().isoformat(),
     }
     return order
 
+
 def main():
     # Kafka producer configuration targeting the local broker
     config = {
-        "bootstrap.servers": "localhost:9092"
+        "bootstrap.servers": "localhost:9092",
+        "client.id": "order-producer",  # Client identifier for tracking and logging
+        "acks": "all",  # Wait for full replication (all in-sync replicas)
+        "retries": 5,  # Number of times to retry on transient errors
+        "retry.backoff.ms": 100,  # Time to wait between retry attempts
+        "batch.num.messages": 1000,  # Maximum number of messages to include in a single batch
+        "linger.ms": 10,  # Delay (ms) to wait for more messages before sending a batch
+        "compression.type": "snappy",  # Compression codec for message batches (snappy, gzip, lz4, zstd)
+        "enable.idempotence": True,  # Ensure message ordering and exactly-once delivery
+        "max.in.flight.requests.per.connection": 5,  # Max concurrent unacknowledged requests per connection
+        "queue.buffering.max.messages": 100000,  # Maximum number of messages in the producer queue
+        "message.timeout.ms": 300000,  # Local timeout for the entire message lifecycle
     }
 
     # Instantiate the Kafka producer with the specified configuration
@@ -42,11 +56,12 @@ def main():
         else:
             print(
                 textwrap.dedent(
-                f"""
+                    f"""
                     Produced event to topic {msg.topic()}:
-                    key = {msg.key().decode('utf-8')}
-                    value = {msg.value().decode('utf-8')}
-                """)
+                    key = {msg.key().decode("utf-8")}
+                    value = {msg.value().decode("utf-8")}
+                """
+                )
             )
 
     # Main loop to generate and send messages indefinitely
@@ -67,7 +82,7 @@ def main():
             producer.poll(0)
 
             # Wait for 1 second to simulate a stream of incoming orders
-            time.sleep(2)
+            time.sleep(1)
 
     except KeyboardInterrupt:
         print("User cancelled.")
@@ -75,6 +90,7 @@ def main():
         print("Flushing producer...")
         # Wait for all messages to be delivered
         producer.flush()
+
 
 if __name__ == "__main__":
     main()

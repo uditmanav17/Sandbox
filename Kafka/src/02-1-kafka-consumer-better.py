@@ -23,7 +23,12 @@ def main():
     parser = argparse.ArgumentParser(description="Test Kafka consumer")
     parser.add_argument("--group-id", "-g", required=True, help="Consumer group ID")
     parser.add_argument("--topic-name", "-t", required=True, help="Topic name")
-    parser.add_argument("--name", "-n", default="consumer-1", help="Name of this consumer")
+    parser.add_argument(
+        "--name",
+        "-n",
+        default="consumer-1",
+        help="Name of this consumer",
+    )
 
     args = parser.parse_args()
 
@@ -54,7 +59,7 @@ def main():
             if msg.error():
                 if msg.error().code() == KafkaError._PARTITION_EOF:
                     # End of partition event - not a real error
-                    logger.debug(f"{msg.topic()} [{msg.partition()}] reached end at offset {msg.offset()}")
+                    logger.debug(f"{msg.topic()} [{msg.partition()}] reached end at offset {msg.offset()}")  # fmt: skip
                 else:
                     logger.error(f"Kafka error: {msg.error()}")
                 continue

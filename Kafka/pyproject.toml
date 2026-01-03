@@ -9,4 +9,5 @@ dependencies = [
     "faker>=40.1.0",
     "loguru>=0.7.3",
     "requests>=2.32.5",
+    "sseclient>=0.0.27",
 ]
