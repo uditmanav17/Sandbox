@@ -1,0 +1,1 @@
+curl -X POST -H "Content-Type: application/json" -d @config_debezium.json http://localhost:8083/connectors

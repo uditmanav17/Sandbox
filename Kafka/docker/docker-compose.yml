@@ -3,6 +3,7 @@ services:
   kafka:
     image: confluentinc/cp-kafka:7.8.0
     container_name: kafka
+    # restart: unless-stopped
     ports:
       - "9092:9092"
     volumes:
@@ -21,20 +22,20 @@ services:
       KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
 
       # Interfaces the broker listens on. 0.0.0.0 means "all interfaces"
-      KAFKA_LISTENERS: EXTERNAL://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
+      KAFKA_LISTENERS: EXTERNAL://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,INTERNAL://0.0.0.0:19092
 
       # Maps listener names to security protocols (PLAINTEXT, SSL, SASL_SSL, etc.)
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT,INTERNAL:PLAINTEXT
 
       # Name of the listener used for communication between brokers
-      KAFKA_INTER_BROKER_LISTENER_NAME: EXTERNAL
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
 
       # Name of the listener used by the controller
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
 
       # The hostname/port clients (like your python script) should use to connect.
       # Must be reachable from OUTSIDE Docker (hence localhost)
-      KAFKA_ADVERTISED_LISTENERS: EXTERNAL://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: EXTERNAL://localhost:9092,INTERNAL://kafka:19092
 
       # How long to keep data logs before deletion (168 hours = 7 days)
       KAFKA_LOG_RETENTION_HOURS: 168
@@ -47,3 +48,65 @@ services:
 
       # A unique UUID for the cluster (required for KRaft formatting)
       CLUSTER_ID: "d33bd245-a018-40a3-91b1-b82cf89d9e1c"
+
+  kafka-connect:
+    image: debezium/connect:3.0.0.Final
+    container_name: kafka-connect
+    restart: unless-stopped
+    profiles:
+      - connect
+    depends_on:
+      - kafka
+    ports:
+      - "8083:8083"
+    environment:
+      BOOTSTRAP_SERVERS: kafka:19092
+      GROUP_ID: "kafka-connect-group"
+      CONFIG_STORAGE_TOPIC: _connect-configs
+      OFFSET_STORAGE_TOPIC: _connect-offsets
+      STATUS_STORAGE_TOPIC: _connect-status
+      KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      INTERNAL_KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      INTERNAL_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    # restart: unless-stopped
+    profiles:
+      - connect
+    environment:
+        POSTGRES_USER: user
+        POSTGRES_PASSWORD: password
+        POSTGRES_DB: onlineshop
+    volumes:
+      - ./data.sql:/docker-entrypoint-initdb.d/data.sql
+    command:
+        - "postgres"
+        - "-c"
+        - "wal_level=logical"
+    ports:
+        - "5432:5432"
+
+  connect-init:
+    image: curlimages/curl
+    container_name: connect-init
+    profiles:
+      - connect
+    depends_on:
+      - kafka-connect
+    volumes:
+      - ./config_debezium.json:/config.json
+    entrypoint: /bin/sh
+    command: >
+      -c '
+      echo "Waiting for Kafka Connect to start...";
+      while [ $(curl -s -o /dev/null -w %{http_code} http://kafka-connect:8083/connectors) -ne 200 ]; do
+        echo "Connect is unavailable - sleeping";
+        sleep 5;
+      done;
+      echo "Kafka Connect is ready! Configuring Debezium connector...";
+      curl -X POST -H "Content-Type: application/json" -d @/config.json http://kafka-connect:8083/connectors;
+      echo "Configuration submitted.";
+      '
