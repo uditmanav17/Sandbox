@@ -35,10 +35,7 @@ def main():
     session = requests.Session()
     session.headers.update(headers)
 
-    print(
-        f"Starting to consume Wikipedia recent changes from {url} \n"
-        f"and produce to Kafka topic '{kafka_topic}'..."
-    )
+    print(f"Starting to consume Wikipedia recent changes from {url} \nand produce to Kafka topic '{kafka_topic}'...")
 
     producer = Producer(producer_conf)
     messages = SSEClient(url, session=session)
@@ -71,8 +68,8 @@ def main():
                     "minor": data["minor"],
                 }
                 producer.produce(
-                    kafka_topic,
-                    json.dumps(message).encode("utf-8"),
+                    topic=kafka_topic,
+                    value=json.dumps(message).encode("utf-8"),
                     callback=delivery_report,
                     key=data["title"].encode("utf-8"),
                 )
