@@ -42,6 +42,23 @@ uv init
 # Initialize a library/application specifically
 uv init --app my-app
 uv init --lib my-lib
+
+# Initialize with a specific Python version
+uv init --python 3.9
+```
+
+### Set/Update Python Version
+**During Init:**
+Pass the `--python` argument as shown above.
+
+**Existing Project:**
+To change the Python version for a project already managed by `uv`:
+1.  Run `uv python pin` to update the `.python-version` file.
+2.  Run `uv sync` to update the virtual environment and lockfile.
+```bash
+# Switch project to Python 3.11
+uv python pin 3.11
+uv sync
 ```
 
 ### Dependency Management
