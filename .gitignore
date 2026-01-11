@@ -9,6 +9,7 @@ __pycache__
 *.zip
 *.sqbpro
 **/*[-_]old*
+/utils/exp
 
 
 
