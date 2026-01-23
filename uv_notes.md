@@ -172,6 +172,33 @@ uv python pin 3.11
 
 ---
 
+## 6. Exporting Requirements
+*Generate a `requirements.txt` file for other tools or CI/CD pipelines.*
+
+### Standard Export
+Includes all dependencies (including dev dependencies) and hashes for security.
+```bash
+uv export --format requirements-txt > requirements.txt
+```
+
+### Production Only (No Dev Dependencies)
+Exclude development dependencies (e.g., `pytest`, `ruff`) for production builds.
+```bash
+uv export --no-dev --format requirements-txt > requirements.txt
+```
+
+### Without Hashes
+By default, `uv export` includes hashes for strict pinning. To generate a cleaner list without hashes:
+```bash
+uv export --no-hashes --format requirements-txt > requirements.txt
+```
+
+### Note on Pinning
+`uv export` uses the `uv.lock` file as the source of truth, so the output `requirements.txt` will always contain **exact pinned versions** of all dependencies (transitive included). This ensures that the environment is reproducible.
+
+---
+
+
 ## Summary of Commands
 
 | Goal | Old Way | UV Way |
